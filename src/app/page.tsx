@@ -51,7 +51,6 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link href="/products">
                   <Button
-                    // onClick={() => setLocation("/products")}
                     className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
                     size="lg"
                   >
