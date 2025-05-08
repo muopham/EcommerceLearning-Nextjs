@@ -10,10 +10,8 @@ import ShoppingCart from "@/components/ShoppingCart";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: {
-    template: "%s | NextShop",
-    default: "Home",
-  },
+  title: "NextShop",
+  description: "Your one-stop shop for modern essentials.",
 };
 export default function RootLayout({
   children,
