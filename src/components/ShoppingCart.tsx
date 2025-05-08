@@ -77,6 +77,7 @@ export default function ShoppingCart() {
                               className="mt-4 text-blue-600 hover:text-blue-800"
                               asChild
                             >
+                              {/* Continue Shopping */}
                               <Link href="/products">Continue Shopping</Link>
                             </Button>
                           </div>

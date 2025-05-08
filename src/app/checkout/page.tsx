@@ -37,6 +37,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/context/CartContext";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { insertOrderSchema } from "@/../shared/schema";
+import { useRouter } from "next/navigation";
 
 // Extended validation schema for the checkout form
 const checkoutFormSchema = insertOrderSchema.extend({
@@ -57,7 +58,8 @@ const checkoutFormSchema = insertOrderSchema.extend({
 type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
 
 export default function Checkout() {
-  const [_, navigate] = useLocation();
+  // const [_, navigate] = useLocation();
+  const route = useRouter();
   const { toast } = useToast();
   const { cartItems, getSubtotal, getTax, getTotal, clearCart, toggleCart } =
     useCart();
@@ -117,64 +119,64 @@ export default function Checkout() {
   }, [cartItems, form, getSubtotal, getTax, getTotal]);
 
   // Scroll to top on mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
+  // }, []);
 
   // Order creation mutation
-  const createOrderMutation = useMutation({
-    mutationFn: async (orderData: CheckoutFormValues) => {
-      // Extract only the fields needed for the order
-      const {
-        sameAsBilling,
-        billingFirstName,
-        billingLastName,
-        billingAddress,
-        billingCity,
-        billingState,
-        billingPostalCode,
-        billingCountry,
-        shippingMethod,
-        agreeToTerms,
-        ...orderFields
-      } = orderData;
+  // const createOrderMutation = useMutation({
+  //   mutationFn: async (orderData: CheckoutFormValues) => {
+  //     // Extract only the fields needed for the order
+  //     const {
+  //       sameAsBilling,
+  //       billingFirstName,
+  //       billingLastName,
+  //       billingAddress,
+  //       billingCity,
+  //       billingState,
+  //       billingPostalCode,
+  //       billingCountry,
+  //       shippingMethod,
+  //       agreeToTerms,
+  //       ...orderFields
+  //     } = orderData;
 
-      // Create order
-      const res = await apiRequest("POST", "/api/orders", orderFields);
-      const order = await res.json();
+  //     // Create order
+  //     const res = await apiRequest("POST", "/api/orders", orderFields);
+  //     const order = await res.json();
 
-      // Add order items
-      for (const item of cartItems) {
-        await apiRequest("POST", `/api/orders/${order.id}/items`, {
-          productId: item.id,
-          quantity: item.quantity,
-          price: item.price,
-        });
-      }
+  //     // Add order items
+  //     for (const item of cartItems) {
+  //       await apiRequest("POST", `/api/orders/${order.id}/items`, {
+  //         productId: item.id,
+  //         quantity: item.quantity,
+  //         price: item.price,
+  //       });
+  //     }
 
-      return order;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
-      // Show success message
-      toast({
-        title: "Order Placed Successfully!",
-        description:
-          "Thank you for your purchase. We'll send you a confirmation email shortly.",
-        variant: "default",
-      });
-      // Clear cart and redirect to success page
-      clearCart();
-      navigate("/");
-    },
-    onError: (error) => {
-      toast({
-        title: "Failed to place order",
-        description: error.message || "Please try again later.",
-        variant: "destructive",
-      });
-    },
-  });
+  //     return order;
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+  //     // Show success message
+  //     toast({
+  //       title: "Order Placed Successfully!",
+  //       description:
+  //         "Thank you for your purchase. We'll send you a confirmation email shortly.",
+  //       variant: "default",
+  //     });
+  //     // Clear cart and redirect to success page
+  //     clearCart();
+  //     navigate("/");
+  //   },
+  //   onError: (error) => {
+  //     toast({
+  //       title: "Failed to place order",
+  //       description: error.message || "Please try again later.",
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
 
   const onSubmit = (data: CheckoutFormValues) => {
     // If on shipping/billing step, go to payment step
@@ -191,8 +193,10 @@ export default function Checkout() {
       return;
     }
 
+    console.log("Order Data:", data);
+
     // If on review step, submit the order
-    createOrderMutation.mutate(data);
+    // createOrderMutation.mutate(data);
   };
 
   // Navigate back to previous step
@@ -212,7 +216,7 @@ export default function Checkout() {
           <p className="text-gray-600 mb-6">
             Looks like you haven't added any items to your cart yet.
           </p>
-          <Button onClick={() => navigate("/products")}>
+          <Button onClick={() => route.push("/products")}>
             Continue Shopping
           </Button>
         </div>
@@ -325,7 +329,7 @@ export default function Checkout() {
                 checkoutStep === 4 ? "text-white" : "text-gray-600"
               } flex items-center justify-center`}
             >
-              "4"
+              4
             </div>
             <div
               className={`absolute top-0 -ml-6 text-xs font-medium ${
@@ -337,7 +341,6 @@ export default function Checkout() {
           </div>
         </div>
       </div>
-
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex flex-col lg:flex-row gap-8">
@@ -886,7 +889,7 @@ export default function Checkout() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate("/products")}
+                    onClick={() => route.push("/products")}
                     className="flex items-center"
                   >
                     <ChevronLeft className="h-4 w-4 mr-2" /> Continue Shopping
@@ -895,12 +898,13 @@ export default function Checkout() {
 
                 <Button
                   type="submit"
+                  // onClick={() => setCheckoutStep(checkoutStep + 1)}
                   className="bg-blue-600 text-white font-medium py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors"
-                  disabled={createOrderMutation.isPending}
+                  // disabled={createOrderMutation.isPending}
                 >
-                  {createOrderMutation.isPending ? (
+                  {/* {createOrderMutation.isPending ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  ) : null}
+                  ) : null} */}
                   {checkoutStep === 1 && "Continue to Payment"}
                   {checkoutStep === 2 && "Review Order"}
                   {checkoutStep === 3 && "Place Order"}
@@ -917,7 +921,7 @@ export default function Checkout() {
                   <div className="py-4 text-center text-gray-500">
                     <p>Your cart is empty</p>
                     <Button
-                      onClick={() => navigate("/products")}
+                      onClick={() => route.push("/products")}
                       variant="link"
                       className="mt-4 text-blue-600 hover:text-blue-800"
                     >

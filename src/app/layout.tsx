@@ -9,6 +9,12 @@ import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
 import "./globals.css";
 
+export const metadata: Metadata = {
+  title: {
+    template: "%s | NextShop",
+    default: "Home",
+  },
+};
 export default function RootLayout({
   children,
 }: Readonly<{

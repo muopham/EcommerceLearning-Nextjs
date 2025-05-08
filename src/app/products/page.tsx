@@ -24,9 +24,11 @@ import {
 import ProductCard from "@/components/ProductCard";
 import StarRating from "@/components/StarRating";
 import { Product } from "../../../shared/schema";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 export default function Products() {
   const route = useRouter();
+  const pathname = usePathname();
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<string | null>(null);
@@ -122,7 +124,7 @@ export default function Products() {
     setSortBy("featured");
 
     // Remove query params but keep the path
-    route.push("/products");
+    route.push(pathname);
   };
 
   return (
