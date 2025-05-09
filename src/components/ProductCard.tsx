@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { Heart, ShoppingCart } from "lucide-react";
@@ -34,11 +35,16 @@ export default function ProductCard({
 }: ProductCardProps) {
   const [isFavorited, setIsFavorited] = useState(false);
   const { addToCart } = useCart();
+  const { toast } = useToast();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     addToCart({ id, name, price, imageUrl });
+    toast({
+      title: "Product added successfully!",
+      variant: "default",
+    });
   };
 
   const toggleFavorite = (e: React.MouseEvent) => {

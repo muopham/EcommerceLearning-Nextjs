@@ -58,13 +58,12 @@ const checkoutFormSchema = insertOrderSchema.extend({
 type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
 
 export default function Checkout() {
-  // const [_, navigate] = useLocation();
   const route = useRouter();
   const { toast } = useToast();
   const { cartItems, getSubtotal, getTax, getTotal, clearCart, toggleCart } =
     useCart();
   const [checkoutStep, setCheckoutStep] = useState(1);
-
+  const [isLoading, setIsLoading] = useState(false);
   // Initialize the form with default values
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
@@ -119,9 +118,9 @@ export default function Checkout() {
   }, [cartItems, form, getSubtotal, getTax, getTotal]);
 
   // Scroll to top on mount
-  // useEffect(() => {
-  //   window.scrollTo(0, 0);
-  // }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Order creation mutation
   // const createOrderMutation = useMutation({
@@ -145,7 +144,7 @@ export default function Checkout() {
   //     const res = await apiRequest("POST", "/api/orders", orderFields);
   //     const order = await res.json();
 
-  //     // Add order items
+  //     // // Add order items
   //     for (const item of cartItems) {
   //       await apiRequest("POST", `/api/orders/${order.id}/items`, {
   //         productId: item.id,
@@ -153,11 +152,10 @@ export default function Checkout() {
   //         price: item.price,
   //       });
   //     }
-
   //     return order;
   //   },
   //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+  //     // queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
   //     // Show success message
   //     toast({
   //       title: "Order Placed Successfully!",
@@ -170,6 +168,7 @@ export default function Checkout() {
   //     navigate("/");
   //   },
   //   onError: (error) => {
+  //     console.error("Order mutation error:", error);
   //     toast({
   //       title: "Failed to place order",
   //       description: error.message || "Please try again later.",
@@ -178,25 +177,65 @@ export default function Checkout() {
   //   },
   // });
 
-  const onSubmit = (data: CheckoutFormValues) => {
-    // If on shipping/billing step, go to payment step
+  // const onSubmit = (data: CheckoutFormValues) => {
+  //   // If on shipping/billing step, go to payment step
+  //   if (checkoutStep === 1) {
+  //     setCheckoutStep(2);
+  //     window.scrollTo(0, 0);
+  //     return;
+  //   }
+
+  //   // If on payment step, go to review step
+  //   if (checkoutStep === 2) {
+  //     setCheckoutStep(3);
+  //     window.scrollTo(0, 0);
+  //     return;
+  //   }
+
+  //   // If on review step, submit the order
+  //   // createOrderMutation.mutate(data);
+  // };
+
+  const handleCheckoutStep = async () => {
     if (checkoutStep === 1) {
       setCheckoutStep(2);
       window.scrollTo(0, 0);
       return;
     }
 
-    // If on payment step, go to review step
     if (checkoutStep === 2) {
       setCheckoutStep(3);
       window.scrollTo(0, 0);
       return;
     }
 
-    console.log("Order Data:", data);
+    if (checkoutStep === 3) {
+      // Start loading
+      setIsLoading(true);
 
-    // If on review step, submit the order
-    // createOrderMutation.mutate(data);
+      try {
+        // Simulate API call with 2 second delay
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        toast({
+          title: "Order Placed Successfully!",
+          description:
+            "Thank you for your purchase. We'll send you a confirmation email shortly.",
+          variant: "default",
+        });
+
+        // route.push("/");
+        clearCart();
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   // Navigate back to previous step
@@ -329,7 +368,7 @@ export default function Checkout() {
                 checkoutStep === 4 ? "text-white" : "text-gray-600"
               } flex items-center justify-center`}
             >
-              4
+              "4"
             </div>
             <div
               className={`absolute top-0 -ml-6 text-xs font-medium ${
@@ -341,8 +380,9 @@ export default function Checkout() {
           </div>
         </div>
       </div>
+
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form className="space-y-6">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Main checkout form */}
             <div className="lg:w-2/3">
@@ -362,7 +402,7 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>First Name *</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input required {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -375,7 +415,7 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>Last Name *</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input required {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -389,7 +429,7 @@ export default function Checkout() {
                             <FormItem>
                               <FormLabel>Street Address *</FormLabel>
                               <FormControl>
-                                <Input {...field} />
+                                <Input required {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -403,7 +443,7 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>City *</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input required {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -416,7 +456,7 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>Postal Code *</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input required {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -429,7 +469,7 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>State/Province *</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input required {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -464,7 +504,7 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>Phone Number *</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input required {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -477,7 +517,7 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>Email Address *</FormLabel>
                             <FormControl>
-                              <Input type="email" {...field} />
+                              <Input required type="email" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -517,7 +557,11 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>First Name *</FormLabel>
                             <FormControl>
-                              <Input {...field} disabled={sameAsBilling} />
+                              <Input
+                                required
+                                {...field}
+                                disabled={sameAsBilling}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -530,7 +574,11 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>Last Name *</FormLabel>
                             <FormControl>
-                              <Input {...field} disabled={sameAsBilling} />
+                              <Input
+                                required
+                                {...field}
+                                disabled={sameAsBilling}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -544,7 +592,11 @@ export default function Checkout() {
                             <FormItem>
                               <FormLabel>Street Address *</FormLabel>
                               <FormControl>
-                                <Input {...field} disabled={sameAsBilling} />
+                                <Input
+                                  required
+                                  {...field}
+                                  disabled={sameAsBilling}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -558,7 +610,11 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>City *</FormLabel>
                             <FormControl>
-                              <Input {...field} disabled={sameAsBilling} />
+                              <Input
+                                required
+                                {...field}
+                                disabled={sameAsBilling}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -571,7 +627,11 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>Postal Code *</FormLabel>
                             <FormControl>
-                              <Input {...field} disabled={sameAsBilling} />
+                              <Input
+                                required
+                                {...field}
+                                disabled={sameAsBilling}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -584,7 +644,11 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>State/Province *</FormLabel>
                             <FormControl>
-                              <Input {...field} disabled={sameAsBilling} />
+                              <Input
+                                required
+                                {...field}
+                                disabled={sameAsBilling}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -709,6 +773,7 @@ export default function Checkout() {
                         <FormLabel>Card Number *</FormLabel>
                         <div className="relative">
                           <Input
+                            required
                             placeholder="1234 5678 9012 3456"
                             className="pl-12"
                           />
@@ -717,7 +782,7 @@ export default function Checkout() {
                       </div>
                       <div>
                         <FormLabel>Expiration Date *</FormLabel>
-                        <Input placeholder="MM / YY" />
+                        <Input required placeholder="MM / YY" />
                       </div>
                       <div>
                         <FormLabel>CVV *</FormLabel>
@@ -897,14 +962,14 @@ export default function Checkout() {
                 )}
 
                 <Button
-                  type="submit"
-                  // onClick={() => setCheckoutStep(checkoutStep + 1)}
+                  type="button"
+                  onClick={handleCheckoutStep}
                   className="bg-blue-600 text-white font-medium py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors"
-                  // disabled={createOrderMutation.isPending}
+                  disabled={isLoading}
                 >
-                  {/* {createOrderMutation.isPending ? (
+                  {isLoading ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  ) : null} */}
+                  ) : null}
                   {checkoutStep === 1 && "Continue to Payment"}
                   {checkoutStep === 2 && "Review Order"}
                   {checkoutStep === 3 && "Place Order"}
