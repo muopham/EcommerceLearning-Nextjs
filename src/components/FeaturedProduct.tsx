@@ -20,7 +20,6 @@ export default function FeaturedProduct() {
           <h2 className="text-3xl font-bold">Featured Products</h2>
           <Link href={"/products"}>
             <Button
-              // onClick={() => redirect("/products")}
               variant="link"
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
