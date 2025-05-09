@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CartProvider } from "@/context/CartContext";
+import { MobileMenuProvider } from "@/context/MobileMenuContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,7 +27,9 @@ export default function RootLayout({
             <TooltipProvider>
               <Toaster />
               <div className="flex flex-col min-h-screen">
-                <Header />
+                <MobileMenuProvider>
+                  <Header />
+                </MobileMenuProvider>
                 <main className="flex-grow">{children}</main>
                 <Footer />
                 <ShoppingCart />

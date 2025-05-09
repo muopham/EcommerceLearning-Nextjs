@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
-import SearchHeader from "./SearchHeader";
-import MobileHeader from "./MobileHeader";
+import HeaderAction from "./HeaderAction";
+import HeaderMobileMenu from "./HeaderMobileMenu";
 
 export default function Header() {
   return (
@@ -19,37 +19,28 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <Link
-              href="/"
-              className="font-medium hover:text-blue-600 transition-colors"
-            >
-              Home
-            </Link>
-            <Link
-              href="/products"
-              className="font-medium hover:text-blue-600 transition-colors"
-            >
-              Products
-            </Link>
-            <Link
-              href="#"
-              className="font-medium hover:text-blue-600 transition-colors"
-            >
-              Categories
-            </Link>
-            <Link
-              href="#"
-              className="font-medium hover:text-blue-600 transition-colors"
-            >
-              About
-            </Link>
+            {["Home", "Products", "Categories", "About"].map((item) => (
+              <Link
+                key={item}
+                href={
+                  item === "Home"
+                    ? "/"
+                    : item === "Products"
+                    ? "/products"
+                    : "#"
+                }
+                className="font-medium hover:text-blue-600 transition-colors py-2 border-b border-gray-100"
+              >
+                {item}
+              </Link>
+            ))}
           </nav>
 
           {/* Actions */}
-          <SearchHeader />
+          <HeaderAction />
         </div>
         {/* Mobile Navigation */}
-        <MobileHeader />
+        <HeaderMobileMenu />
       </div>
     </header>
   );
