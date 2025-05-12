@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { LayoutGrid, List } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
